@@ -105,6 +105,17 @@ function ting_search_carousel_admin_form($form, &$form_state) {
     '#value' => $searches_num,
   );
 
+  $form['ting_search_carousel']['ting_search_carousel_item_sorting'] = array(
+    '#type' => 'select',
+    '#title' => t('Sorting'),
+    '#options' => array(
+      '' => t('- None -'),
+      'acquisitionDate_descending' => t('Acquisition date (Descending)'),
+    ),
+    '#default_value' => variable_get('ting_search_carousel_item_sorting', ''),
+    '#description' => t('If not set, defaults to Ranking'),
+  );
+
   // Ajaxified button for new fields.
   $form['ting_search_carousel']['new_search_carousel_button'] = array(
     '#type' => 'button',
@@ -276,7 +287,7 @@ function ting_search_carousel_query_form($item = array(), $index = 0) {
 function ting_search_carousel_search_submit($form, &$form_state) {
   $c = count($form_state['input']['title']);
   $searches = array();
-  $search_items = array();
+  $sort = $form_state['input']['ting_search_carousel_item_sorting'];
 
   for ($i = 0; $i < $c; $i++) {
     // Make an array for saving, ignoring queries w/o title.
@@ -291,6 +302,7 @@ function ting_search_carousel_search_submit($form, &$form_state) {
 
   // Save the queries as a persistent variable.
   variable_set('ting_carousel_search_queries', $searches);
+  variable_set('ting_search_carousel_item_sorting', $sort);
 
   // Make ting search requests.
   ting_search_carousel_do_request();

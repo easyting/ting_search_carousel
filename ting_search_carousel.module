@@ -104,6 +104,7 @@ function ting_search_carousel_cron() {
  */
 function ting_search_carousel_do_request($full = FALSE) {
   $search_queries = variable_get('ting_carousel_search_queries', array());
+  $sort = variable_get('ting_search_carousel_item_sorting', '');
   $search_items = array();
 
   // There are any queries set.
@@ -111,7 +112,12 @@ function ting_search_carousel_do_request($full = FALSE) {
     module_load_include('client.inc', 'ting');
     module_load_include('pages.inc', 'ting_covers');
 
-    $service = new AdditionalInformationService(variable_get('addi_wsdl_url'), variable_get('addi_username'), variable_get('addi_group'), variable_get('addi_password'));
+    $service = new AdditionalInformationService(
+      variable_get('addi_wsdl_url'),
+      variable_get('addi_username'),
+      variable_get('addi_group'),
+      variable_get('addi_password')
+    );
     $j = 0;
 
     // Search for each query up to 100 items.
@@ -124,7 +130,11 @@ function ting_search_carousel_do_request($full = FALSE) {
         $page = 1;
         $collections = array();
         // Make recursive ting calls
-        while ($result = ting_do_search($item['query'], $page++, 50, array('facets' => array(), 'enrich' => TRUE, 'allObjects' => FALSE))) {
+        while ($result = ting_do_search($item['query'], $page++, 50, array(
+          'facets' => array(),
+          'enrich' => TRUE,
+          'allObjects' => FALSE,
+          'sort' => $sort))) {
           if ($result->numTotalCollections == 0) {
             break;
           }
@@ -142,7 +152,14 @@ function ting_search_carousel_do_request($full = FALSE) {
         }
       }
       else {
-        $result = ting_do_search($item['query'], 1, 100, array('facets' => array(), 'enrich' => TRUE, 'allObjects' => FALSE));
+        $result = ting_do_search(
+          $item['query'], 1, 100, array(
+            'facets' => array(),
+            'enrich' => TRUE,
+            'allObjects' => FALSE,
+            'sort' => $sort
+          )
+        );
       }
 
       // For each found collection, find a related item with cover.
@@ -178,9 +195,16 @@ function ting_search_carousel_do_request($full = FALSE) {
 
           $item = new stdClass();
           $item->id = $object->id;
-          $item->creator = isset($object->record['dc:creator']['oss:aut'][0]) ? $object->record['dc:creator']['oss:aut'][0] : '';
-          $item->title = isset($object->record['dc:title'][''][0]) ? $object->record['dc:title'][''][0] : '';
-          $item->image = image_style_url('ting_search_carousel', isset($file->uri) ? $file->uri : $path);
+          $item->creator = isset($object->record['dc:creator']['dkdcplus:aut'][0])
+            ? $object->record['dc:creator']['dkdcplus:aut'][0]
+            : '';
+          $item->title = isset($object->record['dc:title'][''][0])
+            ? $object->record['dc:title'][''][0]
+            : '';
+          $item->image = image_style_url(
+            'ting_search_carousel',
+            isset($file->uri) ? $file->uri : $path
+          );
 
           $search_items[$j][] = $item;
           break;
@@ -193,7 +217,7 @@ function ting_search_carousel_do_request($full = FALSE) {
 
   // Clear & set the cache.
   cache_clear_all('ting_search_result', 'cache');
-  cache_set('ting_search_result', serialize($search_items), 'cache');
+  cache_set('ting_search_result', $search_items, 'cache');
 }
 
 /**
