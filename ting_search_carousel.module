@@ -179,7 +179,7 @@ function ting_search_carousel_do_request($full = FALSE) {
 
           $item = new stdClass();
           $item->id = $object->id;
-          $item->creator = isset($object->record['dc:creator']['oss:aut'][0]) ? $object->record['dc:creator']['oss:aut'][0] : '';
+          $item->creator = isset($object->record['dc:creator']['dkdcplus:aut'][0]) ? $object->record['dc:creator']['dkdcplus:aut'][0] : '';
           $item->title = isset($object->record['dc:title'][''][0]) ? $object->record['dc:title'][''][0] : '';
           $item->image = image_style_url('ting_search_carousel', isset($file->uri) ? $file->uri : $path);
 
