@@ -84,6 +84,10 @@
   position: absolute;
   width: 580px;
 }
+.ting-search-carousel .rs-carousel-runner li {
+  list-style:none;
+  padding-top:5em;
+}
 
 .ting-search-carousel .rs-carousel .rs-carousel-item img {
   max-width: 112px;
