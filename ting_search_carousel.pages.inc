@@ -20,7 +20,7 @@ function ting_search_carousel_result($index) {
     $cache = cache_get('ting_search_result', 'cache');
   }
 
-  $cache_ting_search_result = unserialize($cache->data);
+  $cache_ting_search_result = $cache->data;
   $ting_seach_queries = variable_get('ting_carousel_search_queries', array());
   $subtitle = '';
 

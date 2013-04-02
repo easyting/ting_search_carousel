@@ -104,6 +104,7 @@ function ting_search_carousel_cron() {
  */
 function ting_search_carousel_do_request($full = FALSE) {
   $search_queries = variable_get('ting_carousel_search_queries', array());
+  $sort = variable_get('ting_search_carousel_item_sorting', '');
   $search_items = array();
 
   // There are any queries set.
@@ -124,7 +125,7 @@ function ting_search_carousel_do_request($full = FALSE) {
         $page = 1;
         $collections = array();
         // Make recursive ting calls
-        while ($result = ting_do_search($item['query'], $page++, 50, array('facets' => array(), 'enrich' => TRUE, 'allObjects' => FALSE))) {
+        while ($result = ting_do_search($item['query'], $page++, 50, array('facets' => array(), 'enrich' => TRUE, 'allObjects' => FALSE, 'sort' => $sort))) {
           if ($result->numTotalCollections == 0) {
             break;
           }
@@ -142,7 +143,7 @@ function ting_search_carousel_do_request($full = FALSE) {
         }
       }
       else {
-        $result = ting_do_search($item['query'], 1, 100, array('facets' => array(), 'enrich' => TRUE, 'allObjects' => FALSE));
+        $result = ting_do_search($item['query'], 1, 100, array('facets' => array(), 'enrich' => TRUE, 'allObjects' => FALSE, 'sort' => $sort));
       }
 
       // For each found collection, find a related item with cover.
@@ -193,7 +194,7 @@ function ting_search_carousel_do_request($full = FALSE) {
 
   // Clear & set the cache.
   cache_clear_all('ting_search_result', 'cache');
-  cache_set('ting_search_result', serialize($search_items), 'cache');
+  cache_set('ting_search_result', $search_items, 'cache');
 }
 
 /**
