@@ -29,6 +29,10 @@
       url : Drupal.settings.basePath + 'ting_search_carousel/results/ajax/' + index,
       dataType : 'json',
       success : function(msg) {
+        // Don't proceed if you're on mobile version, since carousel script hangs when container is not visible.
+        if (jQuery('body').hasClass('responsive-layout-mobile')) {
+          return;
+        }
         $('.ting-search-carousel .subtitle').html(msg.subtitle);
 
         if (!carousel) {
